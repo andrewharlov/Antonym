@@ -1,0 +1,564 @@
+<html>
+<head>
+<title>QuizActivity.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { }
+.s2 { color: rgb(0,128,0); font-weight: bold; }
+.s3 { color: rgb(0,0,255); }
+.s4 { color: rgb(128,128,128); font-style: italic; }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+QuizActivity.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<span class="s0">package </span><span class="s1">com.harlov.antonym; 
+ 
+</span><span class="s0">import </span><span class="s1">android.app.AlertDialog; 
+</span><span class="s0">import </span><span class="s1">android.content.ComponentName; 
+</span><span class="s0">import </span><span class="s1">android.content.Context; 
+</span><span class="s0">import </span><span class="s1">android.content.DialogInterface; 
+</span><span class="s0">import </span><span class="s1">android.content.Intent; 
+</span><span class="s0">import </span><span class="s1">android.content.SharedPreferences; 
+</span><span class="s0">import </span><span class="s1">android.content.pm.PackageManager; 
+</span><span class="s0">import </span><span class="s1">android.content.res.Resources; 
+</span><span class="s0">import </span><span class="s1">android.graphics.Color; 
+</span><span class="s0">import </span><span class="s1">android.graphics.drawable.GradientDrawable; 
+</span><span class="s0">import </span><span class="s1">android.os.AsyncTask; 
+</span><span class="s0">import </span><span class="s1">android.support.design.widget.NavigationView; 
+</span><span class="s0">import </span><span class="s1">android.support.v4.view.GravityCompat; 
+</span><span class="s0">import </span><span class="s1">android.support.v4.widget.DrawerLayout; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.ActionBarDrawerToggle; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.app.AppCompatActivity; 
+</span><span class="s0">import </span><span class="s1">android.support.v7.widget.Toolbar; 
+</span><span class="s0">import </span><span class="s1">android.os.Bundle; 
+</span><span class="s0">import </span><span class="s1">android.util.TypedValue; 
+</span><span class="s0">import </span><span class="s1">android.view.Menu; 
+</span><span class="s0">import </span><span class="s1">android.view.MenuItem; 
+</span><span class="s0">import </span><span class="s1">android.view.View; 
+</span><span class="s0">import </span><span class="s1">android.widget.Button; 
+</span><span class="s0">import </span><span class="s1">android.widget.TextView; 
+</span><span class="s0">import </span><span class="s1">android.widget.Toast; 
+ 
+</span><span class="s0">import </span><span class="s1">org.json.JSONArray; 
+</span><span class="s0">import </span><span class="s1">org.json.JSONException; 
+</span><span class="s0">import </span><span class="s1">org.json.JSONObject; 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.BufferedInputStream; 
+</span><span class="s0">import </span><span class="s1">java.io.BufferedReader; 
+</span><span class="s0">import </span><span class="s1">java.io.IOException; 
+</span><span class="s0">import </span><span class="s1">java.io.InputStream; 
+</span><span class="s0">import </span><span class="s1">java.io.InputStreamReader; 
+</span><span class="s0">import </span><span class="s1">java.io.UnsupportedEncodingException; 
+</span><span class="s0">import </span><span class="s1">java.net.HttpURLConnection; 
+</span><span class="s0">import </span><span class="s1">java.net.URL; 
+</span><span class="s0">import </span><span class="s1">java.util.ArrayList; 
+</span><span class="s0">import </span><span class="s1">java.util.Collections; 
+ 
+</span><span class="s0">public class </span><span class="s1">QuizActivity </span><span class="s0">extends </span><span class="s1">AppCompatActivity 
+                        </span><span class="s0">implements </span><span class="s1">NavigationView.OnNavigationItemSelectedListener{ 
+ 
+    </span><span class="s0">public static </span><span class="s1">QuizActivity mQuizActivity = </span><span class="s0">null</span><span class="s1">; 
+    </span><span class="s0">private </span><span class="s1">String quizWord; 
+    </span><span class="s0">private </span><span class="s1">String correctAnswer; 
+    </span><span class="s0">private </span><span class="s1">String allLanguagesCorrectAnswer; 
+    </span><span class="s0">private </span><span class="s1">ArrayList&lt;String&gt; quizAnswersList = </span><span class="s0">new </span><span class="s1">ArrayList&lt;String&gt;(); 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onCreate(Bundle savedInstanceState) { 
+        </span><span class="s0">super</span><span class="s1">.onCreate(savedInstanceState); 
+        setContentView(R.layout.activity_quiz); 
+ 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_quiz); 
+        setSupportActionBar(toolbar); 
+ 
+        getSupportActionBar().setDisplayShowHomeEnabled(</span><span class="s0">true</span><span class="s1">); 
+         
+        getSupportActionBar().setTitle(R.string.quiz_activity_title); 
+ 
+        DrawerLayout drawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout_quiz); 
+        ActionBarDrawerToggle toggle = </span><span class="s0">new </span><span class="s1">ActionBarDrawerToggle( 
+                </span><span class="s0">this</span><span class="s1">, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close); 
+        drawerLayout.setDrawerListener(toggle); 
+        toggle.syncState(); 
+ 
+        NavigationView navigationView = (NavigationView) findViewById(R.id.navigation_view_quiz); 
+        navigationView.setNavigationItemSelectedListener(</span><span class="s0">this</span><span class="s1">); 
+ 
+        checkFirstRun(); 
+        quizAnswersList.clear(); 
+        retrieveCurrentQuizData(); 
+        displayQuizData(); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onNewIntent(Intent intent) { 
+        </span><span class="s0">if </span><span class="s1">(intent.getAction().equals(Constants.ALERT_DIALOG_ACTION)){ 
+            </span><span class="s0">boolean </span><span class="s1">showAlert = intent.getExtras().getBoolean(Constants.ALERT_DIALOG_STATE); 
+            </span><span class="s0">if </span><span class="s1">(showAlert == </span><span class="s0">true</span><span class="s1">){ 
+                showAlertDialog(); 
+            } 
+        } 
+        </span><span class="s0">super</span><span class="s1">.onNewIntent(intent); 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">showAlertDialog(){ 
+        AlertDialog.Builder alertDialogBuilder = </span><span class="s0">new </span><span class="s1">AlertDialog.Builder(</span><span class="s0">this</span><span class="s1">); 
+        alertDialogBuilder.setTitle(R.string.alert_dialog_title); 
+        alertDialogBuilder.setMessage(R.string.alert_dialog_message); 
+        alertDialogBuilder.setPositiveButton(R.string.alert_dialog_button, </span><span class="s0">new </span><span class="s1">DialogInterface.OnClickListener() { 
+            @Override 
+            </span><span class="s0">public void </span><span class="s1">onClick(DialogInterface dialog, </span><span class="s0">int </span><span class="s1">which) { 
+                dialog.dismiss(); 
+                Intent mServiceIntent = </span><span class="s0">new </span><span class="s1">Intent(getBaseContext(), InternetCheckIntentService.</span><span class="s0">class</span><span class="s1">); 
+                getBaseContext().startService(mServiceIntent); 
+            } 
+        }); 
+        AlertDialog alertDialog = alertDialogBuilder.create(); 
+        alertDialog.show(); 
+    } 
+ 
+    </span><span class="s0">class </span><span class="s1">GetNextWords </span><span class="s0">extends </span><span class="s1">AsyncTask&lt;Void, Void, Void&gt; { 
+ 
+        </span><span class="s0">private </span><span class="s1">String jsonString = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+        </span><span class="s0">private </span><span class="s1">StringBuilder resultSB = </span><span class="s0">new </span><span class="s1">StringBuilder(); 
+ 
+        @Override 
+        </span><span class="s0">protected </span><span class="s1">Void doInBackground(Void... params) { 
+             
+            InputStream inputStream = </span><span class="s0">null</span><span class="s1">; 
+ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                 
+                URL urlQuiz = </span><span class="s0">new </span><span class="s1">URL(Constants.QUIZ_ACTIVITY_URL_QUIZ); 
+                HttpURLConnection urlConnection = (HttpURLConnection) urlQuiz.openConnection(); 
+                inputStream = </span><span class="s0">new </span><span class="s1">BufferedInputStream(urlConnection.getInputStream()); 
+ 
+                BufferedReader reader = </span><span class="s0">new </span><span class="s1">BufferedReader(</span><span class="s0">new </span><span class="s1">InputStreamReader(inputStream, </span><span class="s2">&quot;UTF-8&quot;</span><span class="s1">), </span><span class="s3">8</span><span class="s1">); 
+                StringBuilder sb = </span><span class="s0">new </span><span class="s1">StringBuilder(); 
+                String line = </span><span class="s0">null</span><span class="s1">; 
+ 
+                </span><span class="s0">while </span><span class="s1">((line = reader.readLine()) != </span><span class="s0">null</span><span class="s1">){ 
+                    sb.append(line + </span><span class="s2">&quot;</span><span class="s0">\n</span><span class="s2">&quot;</span><span class="s1">); 
+                } 
+ 
+                jsonString = sb.toString(); 
+                JSONObject jObject = </span><span class="s0">new </span><span class="s1">JSONObject(jsonString); 
+                JSONArray jArrayQuiz = jObject.getJSONArray(Constants.QUIZ_ACTIVITY_JSON_ARRAY_QUIZ); 
+ 
+                outputQuizData(jArrayQuiz); 
+            } </span><span class="s0">catch </span><span class="s1">(JSONException e) { 
+                e.printStackTrace(); 
+            } </span><span class="s0">catch </span><span class="s1">(UnsupportedEncodingException e) { 
+                e.printStackTrace(); 
+            } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                e.printStackTrace(); 
+            } 
+ 
+            </span><span class="s0">return null</span><span class="s1">; 
+        } 
+ 
+        </span><span class="s0">protected void </span><span class="s1">outputQuizData(JSONArray jsonArrayQuiz) { 
+ 
+            </span><span class="s0">final </span><span class="s1">String PREFS_NAME = Constants.QUIZ_ACTIVITY_NEXT_DATA_PREF; 
+            </span><span class="s0">final </span><span class="s1">String PREF_QUIZ_WORD_KEY = Constants.QUIZ_ACTIVITY_NEXT_QUIZ_WORD_PREF_KEY; 
+            </span><span class="s0">final </span><span class="s1">String PREF_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_NEXT_CORRECT_ANSWER_PREF_KEY; 
+            </span><span class="s0">final </span><span class="s1">String PREF_FIRST_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_FIRST_BUTTON_PREF_KEY; 
+            </span><span class="s0">final </span><span class="s1">String PREF_SECOND_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_SECOND_BUTTON_PREF_KEY; 
+            </span><span class="s0">final </span><span class="s1">String PREF_THIRD_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_THIRD_BUTTON_PREF_KEY; 
+            </span><span class="s0">final </span><span class="s1">String PREF_ALL_LANG_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_NEXT_ALL_LANG_CORRECT_ANSWER_PREF_KEY; 
+ 
+            String wordToGetOpposite = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+ 
+            String[] words = {</span><span class="s2">&quot;quiz_word&quot;</span><span class="s1">, </span><span class="s2">&quot;correct_answer&quot;</span><span class="s1">, </span><span class="s2">&quot;first_wrong_answer&quot;</span><span class="s1">, 
+                    </span><span class="s2">&quot;second_wrong_answer&quot;</span><span class="s1">}; 
+ 
+            String[] languages = {</span><span class="s2">&quot;english&quot;</span><span class="s1">, </span><span class="s2">&quot;arabic&quot;</span><span class="s1">, </span><span class="s2">&quot;chinese&quot;</span><span class="s1">, </span><span class="s2">&quot;french&quot;</span><span class="s1">, 
+                    </span><span class="s2">&quot;german&quot;</span><span class="s1">, </span><span class="s2">&quot;italian&quot;</span><span class="s1">, </span><span class="s2">&quot;japanese&quot;</span><span class="s1">, </span><span class="s2">&quot;korean&quot;</span><span class="s1">, 
+                    </span><span class="s2">&quot;russian&quot;</span><span class="s1">, </span><span class="s2">&quot;spanish&quot;</span><span class="s1">, </span><span class="s2">&quot;swedish&quot;</span><span class="s1">}; 
+ 
+            SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE); 
+            SharedPreferences.Editor editor = sharedPref.edit(); 
+ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s1">; i &lt; jsonArrayQuiz.length(); i++){ 
+ 
+                    JSONObject jsonObject = jsonArrayQuiz.getJSONObject(i); 
+ 
+                    </span><span class="s0">if </span><span class="s1">(i == </span><span class="s3">0</span><span class="s1">){ 
+                        wordToGetOpposite = jsonObject.getString(words[i]); 
+                        editor.putString(PREF_QUIZ_WORD_KEY, jsonObject.getString(words[i])); 
+                    } </span><span class="s0">else if </span><span class="s1">(i == </span><span class="s3">1</span><span class="s1">){ 
+                        editor.putString(PREF_CORRECT_ANSWER_KEY, jsonObject.getString(words[i])); 
+                        editor.putString(PREF_FIRST_BUTTON_KEY, jsonObject.getString(words[i])); 
+                    } </span><span class="s0">else if </span><span class="s1">(i == </span><span class="s3">2</span><span class="s1">) { 
+                        editor.putString(PREF_SECOND_BUTTON_KEY, jsonObject.getString(words[i])); 
+                    } </span><span class="s0">else if </span><span class="s1">(i == </span><span class="s3">3</span><span class="s1">) { 
+                        editor.putString(PREF_THIRD_BUTTON_KEY, jsonObject.getString(words[i])); 
+                    } 
+                } 
+            } </span><span class="s0">catch </span><span class="s1">(JSONException e) { 
+                e.printStackTrace(); 
+            } 
+             
+            InputStream inputStream = </span><span class="s0">null</span><span class="s1">; 
+            JSONArray jsonArrayTranslations = </span><span class="s0">new </span><span class="s1">JSONArray(); 
+ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                URL urlTranslations = </span><span class="s0">new </span><span class="s1">URL(Constants.QUIZ_ACTIVITY_URL_TRANSLATIONS + wordToGetOpposite); 
+                HttpURLConnection urlConnection = (HttpURLConnection) urlTranslations.openConnection(); 
+                inputStream = </span><span class="s0">new </span><span class="s1">BufferedInputStream(urlConnection.getInputStream()); 
+ 
+                BufferedReader reader = </span><span class="s0">new </span><span class="s1">BufferedReader(</span><span class="s0">new </span><span class="s1">InputStreamReader(inputStream, </span><span class="s2">&quot;UTF-8&quot;</span><span class="s1">), </span><span class="s3">8</span><span class="s1">); 
+                StringBuilder sb = </span><span class="s0">new </span><span class="s1">StringBuilder(); 
+                String line = </span><span class="s0">null</span><span class="s1">; 
+ 
+                </span><span class="s0">while </span><span class="s1">((line = reader.readLine()) != </span><span class="s0">null</span><span class="s1">){ 
+                    sb.append(line + </span><span class="s2">&quot;</span><span class="s0">\n</span><span class="s2">&quot;</span><span class="s1">); 
+                } 
+ 
+                jsonString = sb.toString(); 
+                JSONObject jObject = </span><span class="s0">new </span><span class="s1">JSONObject(jsonString); 
+                jsonArrayTranslations = jObject.getJSONArray(Constants.QUIZ_ACTIVITY_JSON_ARRAY_TRANSLATIONS); 
+            } </span><span class="s0">catch </span><span class="s1">(UnsupportedEncodingException e) { 
+                e.printStackTrace(); 
+            } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                e.printStackTrace(); 
+            } </span><span class="s0">catch </span><span class="s1">(JSONException e) { 
+                e.printStackTrace(); 
+            } 
+ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                </span><span class="s0">for </span><span class="s1">(</span><span class="s0">int </span><span class="s1">i = </span><span class="s3">0</span><span class="s1">; i &lt; jsonArrayTranslations.length(); i++){ 
+                    JSONObject oppositeWordObject = jsonArrayTranslations.getJSONObject(i); 
+ 
+                    resultSB.append(languages[i]).append(</span><span class="s2">&quot; : &quot;</span><span class="s1">). 
+                            append(oppositeWordObject.getString(languages[i])).append(</span><span class="s2">&quot;,&quot;</span><span class="s1">); 
+                } 
+            } </span><span class="s0">catch </span><span class="s1">(JSONException e) { 
+                e.printStackTrace(); 
+            } 
+ 
+            editor.putString(PREF_ALL_LANG_CORRECT_ANSWER_KEY, resultSB.toString()); 
+            editor.apply(); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">displayQuizData(){ 
+ 
+        TextView quizWordTextView = (TextView) findViewById(R.id.quizWordTextView); 
+        quizWordTextView.setText(quizWord); 
+        Collections.shuffle(quizAnswersList); 
+ 
+        Button firstButton = (Button) findViewById(R.id.firstButton); 
+        Button secondButton = (Button) findViewById(R.id.secondButton); 
+        Button thirdButton = (Button) findViewById(R.id.thirdButton); 
+ 
+        </span><span class="s0">if </span><span class="s1">(!quizAnswersList.isEmpty()){ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                firstButton.setText(quizAnswersList.get(</span><span class="s3">0</span><span class="s1">)); 
+                secondButton.setText(quizAnswersList.get(</span><span class="s3">1</span><span class="s1">)); 
+                thirdButton.setText(quizAnswersList.get(</span><span class="s3">2</span><span class="s1">)); 
+            } </span><span class="s0">catch </span><span class="s1">(IndexOutOfBoundsException e){ 
+                e.printStackTrace(); 
+            } 
+        } 
+ 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">saveCurrentQuizData(){ 
+ 
+        </span><span class="s0">final </span><span class="s1">String PREFS_NAME = Constants.QUIZ_ACTIVITY_CURRENT_DATA_PREF; 
+        </span><span class="s0">final </span><span class="s1">String PREF_QUIZ_WORD_KEY = Constants.QUIZ_ACTIVITY_CURRENT_QUIZ_WORD_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_CURRENT_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_ALL_LANG_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_CURRENT_ALL_LANG_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_FIRST_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_FIRST_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_SECOND_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_SECOND_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_THIRD_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_THIRD_BUTTON_PREF_KEY; 
+ 
+        SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE); 
+        SharedPreferences.Editor editor = sharedPref.edit(); 
+ 
+        editor.putString(PREF_QUIZ_WORD_KEY, quizWord); 
+        editor.putString(PREF_CORRECT_ANSWER_KEY, correctAnswer); 
+        editor.putString(PREF_ALL_LANG_CORRECT_ANSWER_KEY, allLanguagesCorrectAnswer); 
+ 
+        </span><span class="s0">if </span><span class="s1">(!quizAnswersList.isEmpty()) { 
+            </span><span class="s0">try </span><span class="s1">{ 
+                editor.putString(PREF_FIRST_BUTTON_KEY, quizAnswersList.get(</span><span class="s3">0</span><span class="s1">)); 
+                editor.putString(PREF_SECOND_BUTTON_KEY, quizAnswersList.get(</span><span class="s3">1</span><span class="s1">)); 
+                editor.putString(PREF_THIRD_BUTTON_KEY, quizAnswersList.get(</span><span class="s3">2</span><span class="s1">)); 
+            } </span><span class="s0">catch </span><span class="s1">(IndexOutOfBoundsException e) { 
+                e.printStackTrace(); 
+            } 
+        } 
+        editor.apply(); 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">retrieveCurrentQuizData(){ 
+ 
+        </span><span class="s0">final </span><span class="s1">String PREFS_NAME = Constants.QUIZ_ACTIVITY_CURRENT_DATA_PREF; 
+        </span><span class="s0">final </span><span class="s1">String PREF_QUIZ_WORD_KEY = Constants.QUIZ_ACTIVITY_CURRENT_QUIZ_WORD_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_CURRENT_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_ALL_LANG_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_CURRENT_ALL_LANG_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_FIRST_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_FIRST_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_SECOND_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_SECOND_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_THIRD_BUTTON_KEY = Constants.QUIZ_ACTIVITY_CURRENT_THIRD_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_VALUE = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+ 
+        resetButtonsColor(); 
+ 
+        SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE); 
+        quizWord = sharedPref.getString(PREF_QUIZ_WORD_KEY, DEFAULT_VALUE); 
+        correctAnswer = sharedPref.getString(PREF_CORRECT_ANSWER_KEY, DEFAULT_VALUE); 
+        allLanguagesCorrectAnswer = sharedPref.getString(PREF_ALL_LANG_CORRECT_ANSWER_KEY, DEFAULT_VALUE); 
+        quizAnswersList.add(sharedPref.getString(PREF_FIRST_BUTTON_KEY, DEFAULT_VALUE)); 
+        quizAnswersList.add(sharedPref.getString(PREF_SECOND_BUTTON_KEY, DEFAULT_VALUE)); 
+        quizAnswersList.add(sharedPref.getString(PREF_THIRD_BUTTON_KEY, DEFAULT_VALUE)); 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">retrieveNextQuizData(){ 
+ 
+        </span><span class="s0">final </span><span class="s1">String PREFS_NAME = Constants.QUIZ_ACTIVITY_NEXT_DATA_PREF; 
+        </span><span class="s0">final </span><span class="s1">String PREF_QUIZ_WORD_KEY = Constants.QUIZ_ACTIVITY_NEXT_QUIZ_WORD_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_NEXT_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_ALL_LANG_CORRECT_ANSWER_KEY = Constants.QUIZ_ACTIVITY_NEXT_ALL_LANG_CORRECT_ANSWER_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_FIRST_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_FIRST_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_SECOND_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_SECOND_BUTTON_PREF_KEY; 
+        </span><span class="s0">final </span><span class="s1">String PREF_THIRD_BUTTON_KEY = Constants.QUIZ_ACTIVITY_NEXT_THIRD_BUTTON_PREF_KEY; 
+ 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_QUIZ_WORD = Constants.DEFAULT_QUIZ_WORD; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_CORRECT_ANSWER = Constants.DEFAULT_CORRECT_ANSWER; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_ALL_LANG_CORRECT_ANSWER = Constants.DEFAULT_ALL_LANG_CORRECT_ANSWER; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_FIRST_BUTTON = Constants.DEFAULT_FIRST_BUTTON; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_SECOND_BUTTON = Constants.DEFAULT_SECOND_BUTTON; 
+        </span><span class="s0">final </span><span class="s1">String DEFAULT_THIRD_BUTTON = Constants.DEFAULT_THIRD_BUTTON; 
+ 
+        SharedPreferences sharedPref = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE); 
+ 
+        </span><span class="s0">if </span><span class="s1">(quizWord.equals(sharedPref.getString(PREF_QUIZ_WORD_KEY, DEFAULT_QUIZ_WORD))){ 
+            Toast.makeText(</span><span class="s0">this</span><span class="s1">, R.string.quiz_getting_next_word_toast, Toast.LENGTH_LONG).show(); 
+        }</span><span class="s0">else </span><span class="s1">{ 
+            resetButtonsColor(); 
+            quizWord = sharedPref.getString(PREF_QUIZ_WORD_KEY, DEFAULT_QUIZ_WORD); 
+            correctAnswer = sharedPref.getString(PREF_CORRECT_ANSWER_KEY, DEFAULT_CORRECT_ANSWER); 
+            allLanguagesCorrectAnswer = sharedPref.getString(PREF_ALL_LANG_CORRECT_ANSWER_KEY, DEFAULT_ALL_LANG_CORRECT_ANSWER); 
+            quizAnswersList.add(sharedPref.getString(PREF_FIRST_BUTTON_KEY, DEFAULT_FIRST_BUTTON)); 
+            quizAnswersList.add(sharedPref.getString(PREF_SECOND_BUTTON_KEY, DEFAULT_SECOND_BUTTON)); 
+            quizAnswersList.add(sharedPref.getString(PREF_THIRD_BUTTON_KEY, DEFAULT_THIRD_BUTTON)); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">onNextClick(View view) { 
+ 
+        quizAnswersList.clear(); 
+        retrieveNextQuizData(); 
+        displayQuizData(); 
+        saveCurrentQuizData(); 
+ 
+        </span><span class="s0">new </span><span class="s1">GetNextWords().execute(); 
+ 
+        Intent mServiceIntent = </span><span class="s0">new </span><span class="s1">Intent(getBaseContext(), InternetCheckIntentService.</span><span class="s0">class</span><span class="s1">); 
+        getBaseContext().startService(mServiceIntent); 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">onFirstButtonClick(View view) { 
+ 
+        String selectedAnswer = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+        Button firstButton = (Button) findViewById(R.id.firstButton); 
+        selectedAnswer = firstButton.getText().toString(); 
+ 
+        </span><span class="s0">if </span><span class="s1">(selectedAnswer.equals(correctAnswer)){ 
+            setButtonColor(firstButton, </span><span class="s0">true</span><span class="s1">); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            setButtonColor(firstButton, </span><span class="s0">false</span><span class="s1">); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">onSecondButtonClick(View view) { 
+ 
+        String selectedAnswer = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+        Button secondButton = (Button) findViewById(R.id.secondButton); 
+        selectedAnswer = secondButton.getText().toString(); 
+ 
+        </span><span class="s0">if </span><span class="s1">(selectedAnswer.equals(correctAnswer)){ 
+            setButtonColor(secondButton, </span><span class="s0">true</span><span class="s1">); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            setButtonColor(secondButton, </span><span class="s0">false</span><span class="s1">); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">onThirdButtonClick(View view) { 
+ 
+        String selectedAnswer = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+        Button thirdButton = (Button) findViewById(R.id.thirdButton); 
+        selectedAnswer = thirdButton.getText().toString(); 
+ 
+        </span><span class="s0">if </span><span class="s1">(selectedAnswer.equals(correctAnswer)){ 
+            setButtonColor(thirdButton, </span><span class="s0">true</span><span class="s1">); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            setButtonColor(thirdButton, </span><span class="s0">false</span><span class="s1">); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">setButtonColor(Button button, </span><span class="s0">boolean </span><span class="s1">isCorrect){ 
+        GradientDrawable drawable = (GradientDrawable) button.getBackground(); 
+        Resources resources = getResources(); 
+        </span><span class="s0">int </span><span class="s1">px = (</span><span class="s0">int</span><span class="s1">) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, </span><span class="s3">3</span><span class="s1">, resources.getDisplayMetrics()); 
+ 
+        </span><span class="s0">if </span><span class="s1">(isCorrect == </span><span class="s0">true</span><span class="s1">){ 
+            drawable.setStroke(px, Color.GREEN); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            drawable.setStroke(px, Color.RED); 
+        } 
+    } 
+ 
+    </span><span class="s0">public void </span><span class="s1">resetButtonsColor(){ 
+        Button firstButton = (Button) findViewById(R.id.firstButton); 
+        Button secondButton = (Button) findViewById(R.id.secondButton); 
+        Button thirdButton = (Button) findViewById(R.id.thirdButton); 
+ 
+        Resources resources = getResources(); 
+        </span><span class="s0">int </span><span class="s1">px = (</span><span class="s0">int</span><span class="s1">) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, </span><span class="s3">3</span><span class="s1">, resources.getDisplayMetrics()); 
+ 
+        GradientDrawable drawable = (GradientDrawable) firstButton.getBackground(); 
+        drawable.setStroke(px, Color.WHITE); 
+        drawable = (GradientDrawable) secondButton.getBackground(); 
+        drawable.setStroke(px, Color.WHITE); 
+        drawable = (GradientDrawable) thirdButton.getBackground(); 
+        drawable.setStroke(px, Color.WHITE); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onCreateOptionsMenu(Menu menu) { 
+        getMenuInflater().inflate(R.menu.quiz_menu, menu); 
+        </span><span class="s0">return true</span><span class="s1">; 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onOptionsItemSelected(MenuItem item) { 
+        </span><span class="s0">int </span><span class="s1">itemId = item.getItemId(); 
+ 
+        </span><span class="s0">if </span><span class="s1">(itemId == R.id.navigate_to_help){ 
+            saveCurrentQuizData(); 
+            Intent intent = </span><span class="s0">new </span><span class="s1">Intent(</span><span class="s0">this</span><span class="s1">, HelpActivity.</span><span class="s0">class</span><span class="s1">); 
+            intent.putExtra(Constants.ALL_LANG_CORRECT_ANSWER_STRING, allLanguagesCorrectAnswer); 
+            startActivity(intent); 
+        } 
+ 
+        </span><span class="s0">return super</span><span class="s1">.onOptionsItemSelected(item); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onNavigationItemSelected(MenuItem item) { 
+ 
+        </span><span class="s4">// Handle navigation view item clicks here.</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">id = item.getItemId(); 
+ 
+        </span><span class="s0">if </span><span class="s1">(id == R.id.nav_quiz) { 
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_quiz); 
+            drawer.closeDrawer(GravityCompat.START); 
+        } </span><span class="s0">else if </span><span class="s1">(id == R.id.nav_search) { 
+            saveCurrentQuizData(); 
+            Intent intent = </span><span class="s0">new </span><span class="s1">Intent(</span><span class="s0">this</span><span class="s1">, SearchActivity.</span><span class="s0">class</span><span class="s1">); 
+            startActivity(intent); 
+            finish(); 
+        } 
+ 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_quiz); 
+        drawer.closeDrawer(GravityCompat.START); 
+        </span><span class="s0">return true</span><span class="s1">; 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public void </span><span class="s1">onBackPressed() { 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_quiz); 
+        </span><span class="s0">if </span><span class="s1">(drawer.isDrawerOpen(GravityCompat.START)) { 
+            drawer.closeDrawer(GravityCompat.START); 
+        } </span><span class="s0">else </span><span class="s1">{ 
+            </span><span class="s0">super</span><span class="s1">.onBackPressed(); 
+        } 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">checkFirstRun() { 
+ 
+        </span><span class="s0">final </span><span class="s1">String PREFS_NAME = Constants.QUIZ_ACTIVITY_FIRST_RUN_PREF; 
+        </span><span class="s0">final </span><span class="s1">String PREF_VERSION_CODE_KEY = Constants.QUIZ_ACTIVITY_VERSION_CODE_PREF_KEY; 
+        </span><span class="s0">final int </span><span class="s1">DOESNT_EXIST = -</span><span class="s3">1</span><span class="s1">; 
+ 
+        </span><span class="s4">// Get current version code</span><span class="s1"> 
+        </span><span class="s0">int </span><span class="s1">currentVersionCode = </span><span class="s3">0</span><span class="s1">; 
+        </span><span class="s0">try </span><span class="s1">{ 
+            currentVersionCode = getPackageManager().getPackageInfo(getPackageName(), </span><span class="s3">0</span><span class="s1">).versionCode; 
+        } </span><span class="s0">catch </span><span class="s1">(android.content.pm.PackageManager.NameNotFoundException e) { 
+            </span><span class="s4">// handle exception</span><span class="s1"> 
+            e.printStackTrace(); 
+            </span><span class="s0">return</span><span class="s1">; 
+        } 
+ 
+        </span><span class="s4">// Get saved version code</span><span class="s1"> 
+        SharedPreferences prefs = getSharedPreferences(PREFS_NAME, MODE_PRIVATE); 
+        </span><span class="s0">int </span><span class="s1">savedVersionCode = prefs.getInt(PREF_VERSION_CODE_KEY, DOESNT_EXIST); 
+ 
+        </span><span class="s4">// Check for first run or upgrade</span><span class="s1"> 
+        </span><span class="s0">if </span><span class="s1">(currentVersionCode == savedVersionCode) { 
+            </span><span class="s4">// This is just a normal run</span><span class="s1"> 
+            Intent mServiceIntent = </span><span class="s0">new </span><span class="s1">Intent(getBaseContext(), InternetCheckIntentService.</span><span class="s0">class</span><span class="s1">); 
+            getBaseContext().startService(mServiceIntent); 
+            </span><span class="s0">return</span><span class="s1">; 
+        } </span><span class="s0">else if </span><span class="s1">(savedVersionCode == DOESNT_EXIST) { 
+            </span><span class="s4">// This is a new install (or the user cleared the shared preferences)</span><span class="s1"> 
+            quizWord = Constants.DEFAULT_QUIZ_WORD; 
+            correctAnswer = Constants.DEFAULT_CORRECT_ANSWER; 
+            quizAnswersList.add(Constants.DEFAULT_FIRST_BUTTON); 
+            quizAnswersList.add(Constants.DEFAULT_SECOND_BUTTON); 
+            quizAnswersList.add(Constants.DEFAULT_THIRD_BUTTON); 
+            allLanguagesCorrectAnswer = </span><span class="s2">&quot;&quot;</span><span class="s1">; 
+            allLanguagesCorrectAnswer = allLanguagesCorrectAnswer + Constants.DEFAULT_ALL_LANG_CORRECT_ANSWER; 
+ 
+            saveCurrentQuizData(); 
+ 
+            </span><span class="s0">new </span><span class="s1">GetNextWords().execute(); 
+ 
+            Intent mServiceIntent = </span><span class="s0">new </span><span class="s1">Intent(getBaseContext(), InternetCheckIntentService.</span><span class="s0">class</span><span class="s1">); 
+            getBaseContext().startService(mServiceIntent); 
+        } </span><span class="s0">else if </span><span class="s1">(currentVersionCode &gt; savedVersionCode) { 
+            </span><span class="s4">// This is an upgrade</span><span class="s1"> 
+        } 
+ 
+        </span><span class="s4">// Update the shared preferences with the current version code</span><span class="s1"> 
+        prefs.edit().putInt(PREF_VERSION_CODE_KEY, currentVersionCode).apply(); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onPause() { 
+        </span><span class="s0">super</span><span class="s1">.onPause(); 
+        mQuizActivity = </span><span class="s0">null</span><span class="s1">; 
+        saveCurrentQuizData(); 
+        setReceiverState(PackageManager.COMPONENT_ENABLED_STATE_DISABLED); 
+    } 
+ 
+    @Override 
+    </span><span class="s0">protected void </span><span class="s1">onResume() { 
+        </span><span class="s0">super</span><span class="s1">.onResume(); 
+        mQuizActivity = </span><span class="s0">this</span><span class="s1">; 
+        setReceiverState(PackageManager.COMPONENT_ENABLED_STATE_ENABLED); 
+    } 
+ 
+    </span><span class="s0">private void </span><span class="s1">setReceiverState(</span><span class="s0">int </span><span class="s1">receiverState) { 
+        ComponentName receiver = </span><span class="s0">new </span><span class="s1">ComponentName(</span><span class="s0">this</span><span class="s1">, NetworkChangeReceiver.</span><span class="s0">class</span><span class="s1">); 
+        PackageManager pm = </span><span class="s0">this</span><span class="s1">.getPackageManager(); 
+        pm.setComponentEnabledSetting(receiver, receiverState, 
+                PackageManager.DONT_KILL_APP); 
+    } 
+} 
+</span></pre>
+</body>
+</html>

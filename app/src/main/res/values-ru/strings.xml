@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Antonym</string>
+
+    <string name="quiz_activity_title">Тест</string>
+    <string name="quiz_getting_next_word_toast">Принимаем следующее слово...</string>
+    <string name="quiz_next_button_text">Далее</string>
+
+    <string name="search_activity_title">Поиск</string>
+    <string name="search_view_hint">Поиск</string>
+    <string name="click_search_icon_title">Поиск</string>
+    <string name="search_performed_toast">Ищим антоним...</string>
+    <string name="search_wrong_query_toast">Не найдено</string>
+
+    <string name="search_settings_description" translatable="false">Antonym words</string>
+
+    <string name="help_activity_title">Ответ</string>
+    <string name="click_help_activity_title">Ответ</string>
+
+    <string name="alert_dialog_title">Отсутствует соединение</string>
+    <string name="alert_dialog_message">Нет соединения с контент сервером.
+        Пожалуйста, проверьте подключение к Интернету.
+        Если данная проблема повторяется, повторите попытку позже.</string>
+    <string name="alert_dialog_button">Повторить</string>
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+</resources>

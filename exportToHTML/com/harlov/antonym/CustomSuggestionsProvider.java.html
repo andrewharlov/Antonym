@@ -1,0 +1,179 @@
+<html>
+<head>
+<title>CustomSuggestionsProvider.java</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<style type="text/css">
+.ln { color: rgb(0,0,0); font-weight: normal; font-style: normal; }
+.s0 { color: rgb(0,0,128); font-weight: bold; }
+.s1 { }
+.s2 { color: rgb(0,128,0); font-weight: bold; }
+.s3 { color: rgb(0,0,255); }
+</style>
+</head>
+<BODY BGCOLOR="#ffffff">
+<TABLE CELLSPACING=0 CELLPADDING=5 COLS=1 WIDTH="100%" BGCOLOR="#C0C0C0" >
+<TR><TD><CENTER>
+<FONT FACE="Arial, Helvetica" COLOR="#000000">
+CustomSuggestionsProvider.java</FONT>
+</center></TD></TR></TABLE>
+<pre>
+
+<span class="s0">package </span><span class="s1">com.harlov.antonym; 
+ 
+</span><span class="s0">import </span><span class="s1">android.content.ContentProvider; 
+</span><span class="s0">import </span><span class="s1">android.content.ContentValues; 
+</span><span class="s0">import </span><span class="s1">android.content.Context; 
+</span><span class="s0">import </span><span class="s1">android.content.res.Resources; 
+</span><span class="s0">import </span><span class="s1">android.database.Cursor; 
+</span><span class="s0">import </span><span class="s1">android.database.sqlite.SQLiteDatabase; 
+</span><span class="s0">import </span><span class="s1">android.database.sqlite.SQLiteOpenHelper; 
+</span><span class="s0">import </span><span class="s1">android.database.sqlite.SQLiteQueryBuilder; 
+</span><span class="s0">import </span><span class="s1">android.net.Uri; 
+</span><span class="s0">import </span><span class="s1">android.support.annotation.Nullable; 
+</span><span class="s0">import </span><span class="s1">android.text.TextUtils; 
+</span><span class="s0">import </span><span class="s1">android.util.Log; 
+ 
+</span><span class="s0">import </span><span class="s1">java.io.BufferedReader; 
+</span><span class="s0">import </span><span class="s1">java.io.IOException; 
+</span><span class="s0">import </span><span class="s1">java.io.InputStream; 
+</span><span class="s0">import </span><span class="s1">java.io.InputStreamReader; 
+ 
+</span><span class="s0">public class </span><span class="s1">CustomSuggestionsProvider </span><span class="s0">extends </span><span class="s1">ContentProvider{ 
+    </span><span class="s0">private static final </span><span class="s1">String TAG = </span><span class="s2">&quot;SuggestionsDatabase&quot;</span><span class="s1">; 
+ 
+    </span><span class="s0">public static final </span><span class="s1">String COL_ID = </span><span class="s2">&quot;_id&quot;</span><span class="s1">; 
+    </span><span class="s0">public static final </span><span class="s1">String COL_WORD = </span><span class="s2">&quot;suggest_text_1&quot;</span><span class="s1">; 
+    </span><span class="s0">public static final </span><span class="s1">String COL_INTENT_DATA = </span><span class="s2">&quot;suggest_intent_data&quot;</span><span class="s1">; 
+ 
+    </span><span class="s0">private static final </span><span class="s1">String DATABASE_NAME = </span><span class="s2">&quot;SUGGESTIONS&quot;</span><span class="s1">; 
+    </span><span class="s0">private static final </span><span class="s1">String FTS_VIRTUAL_TABLE = </span><span class="s2">&quot;FTS&quot;</span><span class="s1">; 
+    </span><span class="s0">private static final int </span><span class="s1">DATABASE_VERSION = </span><span class="s3">1</span><span class="s1">; 
+ 
+    </span><span class="s0">private </span><span class="s1">DatabaseOpenHelper mDatabaseOpenHelper; 
+    </span><span class="s0">private static </span><span class="s1">SQLiteDatabase mDatabase; 
+ 
+    @Override 
+    </span><span class="s0">public boolean </span><span class="s1">onCreate() { 
+        Log.w(TAG, </span><span class="s2">&quot;ContentProvider - onCreate&quot;</span><span class="s1">); 
+        mDatabaseOpenHelper = </span><span class="s0">new </span><span class="s1">DatabaseOpenHelper(getContext()); 
+        Log.w(TAG, </span><span class="s2">&quot;ContentProvider - called getReadableDatabase()&quot;</span><span class="s1">); 
+        mDatabaseOpenHelper.getReadableDatabase(); 
+        </span><span class="s0">return true</span><span class="s1">; 
+    } 
+ 
+    @Nullable 
+    @Override 
+    </span><span class="s0">public </span><span class="s1">Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) { 
+        SQLiteQueryBuilder qBuilder = </span><span class="s0">new </span><span class="s1">SQLiteQueryBuilder(); 
+        qBuilder.setTables(FTS_VIRTUAL_TABLE); 
+ 
+        String query = uri.getLastPathSegment().toLowerCase(); 
+        selection = FTS_VIRTUAL_TABLE + </span><span class="s2">&quot; MATCH ?&quot;</span><span class="s1">; 
+        selectionArgs = </span><span class="s0">new </span><span class="s1">String[] {query + </span><span class="s2">&quot;*&quot;</span><span class="s1">}; 
+ 
+        Cursor cursor = qBuilder.query(mDatabaseOpenHelper.getReadableDatabase(), 
+                projection, selection, selectionArgs, </span><span class="s0">null</span><span class="s1">, </span><span class="s0">null</span><span class="s1">, sortOrder); 
+        </span><span class="s0">return </span><span class="s1">cursor; 
+    } 
+ 
+    @Nullable 
+    @Override 
+    </span><span class="s0">public </span><span class="s1">String getType(Uri uri) { 
+        </span><span class="s0">return null</span><span class="s1">; 
+    } 
+ 
+    @Nullable 
+    @Override 
+    </span><span class="s0">public </span><span class="s1">Uri insert(Uri uri, ContentValues values) { 
+        </span><span class="s0">return null</span><span class="s1">; 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public int </span><span class="s1">delete(Uri uri, String selection, String[] selectionArgs) { 
+        </span><span class="s0">return </span><span class="s3">0</span><span class="s1">; 
+    } 
+ 
+    @Override 
+    </span><span class="s0">public int </span><span class="s1">update(Uri uri, ContentValues values, String selection, String[] selectionArgs) { 
+        </span><span class="s0">return </span><span class="s3">0</span><span class="s1">; 
+    } 
+ 
+    </span><span class="s0">private static class </span><span class="s1">DatabaseOpenHelper </span><span class="s0">extends </span><span class="s1">SQLiteOpenHelper { 
+ 
+        </span><span class="s0">private final </span><span class="s1">Context mHelperContext; 
+ 
+        </span><span class="s0">private static final </span><span class="s1">String FTS_TABLE_CREATE = 
+                </span><span class="s2">&quot;CREATE VIRTUAL TABLE &quot; </span><span class="s1">+ FTS_VIRTUAL_TABLE + 
+                        </span><span class="s2">&quot; USING fts3 (&quot; </span><span class="s1">+ 
+                        COL_ID + </span><span class="s2">&quot;, &quot; </span><span class="s1">+ 
+                        COL_WORD + </span><span class="s2">&quot;, &quot; </span><span class="s1">+ 
+                        COL_INTENT_DATA + </span><span class="s2">&quot;)&quot;</span><span class="s1">; 
+ 
+        DatabaseOpenHelper(Context context) { 
+            </span><span class="s0">super</span><span class="s1">(context, DATABASE_NAME, </span><span class="s0">null</span><span class="s1">, DATABASE_VERSION); 
+            Log.w(TAG, </span><span class="s2">&quot;SQLiteOpenHelper - constructor&quot;</span><span class="s1">); 
+            mHelperContext = context; 
+        } 
+ 
+        @Override 
+        </span><span class="s0">public void </span><span class="s1">onCreate(SQLiteDatabase db) { 
+            Log.w(TAG, </span><span class="s2">&quot;SQLiteOpenHelper - onCreate&quot;</span><span class="s1">); 
+            db.execSQL(FTS_TABLE_CREATE); 
+            loadDictionary(); 
+        } 
+ 
+        @Override 
+        </span><span class="s0">public void </span><span class="s1">onUpgrade(SQLiteDatabase db, </span><span class="s0">int </span><span class="s1">oldVersion, </span><span class="s0">int </span><span class="s1">newVersion) { 
+            Log.w(TAG, </span><span class="s2">&quot;Upgrading database from version &quot; </span><span class="s1">+ oldVersion + </span><span class="s2">&quot; to &quot;</span><span class="s1"> 
+                    + newVersion + </span><span class="s2">&quot;, which will destroy all old data&quot;</span><span class="s1">); 
+            db.execSQL(</span><span class="s2">&quot;DROP TABLE IF EXISTS &quot; </span><span class="s1">+ FTS_VIRTUAL_TABLE); 
+            onCreate(db); 
+        } 
+ 
+        </span><span class="s0">private void </span><span class="s1">loadDictionary() { 
+            </span><span class="s0">new </span><span class="s1">Thread(</span><span class="s0">new </span><span class="s1">Runnable() { 
+                </span><span class="s0">public void </span><span class="s1">run() { 
+                    </span><span class="s0">try </span><span class="s1">{ 
+                        loadWords(); 
+                    } </span><span class="s0">catch </span><span class="s1">(IOException e) { 
+                        </span><span class="s0">throw new </span><span class="s1">RuntimeException(e); 
+                    } 
+                } 
+            }).start(); 
+        } 
+ 
+        </span><span class="s0">private void </span><span class="s1">loadWords() </span><span class="s0">throws </span><span class="s1">IOException { 
+            Log.w(TAG, </span><span class="s2">&quot;SQLiteOpenHelper - called loadWords()&quot;</span><span class="s1">); 
+            </span><span class="s0">final </span><span class="s1">Resources resources = mHelperContext.getResources(); 
+            InputStream inputStream = resources.openRawResource(R.raw.suggestions); 
+            BufferedReader reader = </span><span class="s0">new </span><span class="s1">BufferedReader(</span><span class="s0">new </span><span class="s1">InputStreamReader(inputStream)); 
+ 
+            </span><span class="s0">try </span><span class="s1">{ 
+                String line; 
+                </span><span class="s0">while </span><span class="s1">((line = reader.readLine()) != </span><span class="s0">null</span><span class="s1">) { 
+                    String[] strings = TextUtils.split(line, </span><span class="s2">&quot;-&quot;</span><span class="s1">); 
+                    </span><span class="s0">if </span><span class="s1">(strings.length &lt; </span><span class="s3">2</span><span class="s1">) </span><span class="s0">continue</span><span class="s1">; 
+                    </span><span class="s0">long </span><span class="s1">id = addWord(strings[</span><span class="s3">0</span><span class="s1">].trim(), strings[</span><span class="s3">1</span><span class="s1">].trim()); 
+                    </span><span class="s0">if </span><span class="s1">(id &lt; </span><span class="s3">0</span><span class="s1">) { 
+                        Log.e(TAG, </span><span class="s2">&quot;Unable to add word: &quot; </span><span class="s1">+ strings[</span><span class="s3">0</span><span class="s1">].trim()); 
+                    } 
+                } 
+            } </span><span class="s0">finally </span><span class="s1">{ 
+                reader.close(); 
+            } 
+        } 
+ 
+        </span><span class="s0">public long </span><span class="s1">addWord(String id, String word) { 
+            ContentValues initialValues = </span><span class="s0">new </span><span class="s1">ContentValues(); 
+            initialValues.put(COL_ID, id); 
+            initialValues.put(COL_WORD, word); 
+            initialValues.put(COL_INTENT_DATA, word); 
+ 
+            mDatabase = getWritableDatabase(); 
+            </span><span class="s0">return </span><span class="s1">mDatabase.insert(FTS_VIRTUAL_TABLE, </span><span class="s0">null</span><span class="s1">, initialValues); 
+        } 
+    } 
+} 
+</span></pre>
+</body>
+</html>

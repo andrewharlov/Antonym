@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="none">
+        <item
+            android:id="@+id/nav_quiz"
+            android:icon="@mipmap/ic_import_contacts_white_24dp"
+            android:title="@string/quiz_activity_title" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@mipmap/ic_search_white_24dp"
+            android:title="@string/search_activity_title" />
+    </group>
+
+</menu>

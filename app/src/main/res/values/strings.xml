@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name" translatable="false">Antonym</string>
+
+    <string name="quiz_activity_title">Test</string>
+    <string name="quiz_getting_next_word_toast">Getting next word...</string>
+    <string name="quiz_next_button_text">Next</string>
+
+    <string name="search_activity_title">Search</string>
+    <string name="search_view_hint">Search</string>
+    <string name="click_search_icon_title">Search</string>
+    <string name="search_performed_toast">Getting antonym...</string>
+    <string name="search_wrong_query_toast">No results</string>
+
+    <string name="search_settings_description" translatable="false">Antonym words</string>
+
+    <string name="help_activity_title">Answer</string>
+    <string name="click_help_activity_title">Answer</string>
+
+    <string name="alert_dialog_title">Unable to connect</string>
+    <string name="alert_dialog_message">The content server could not be reached.
+        Make sure the internet connection is working.
+        If the problem persist, please try again later.</string>
+    <string name="alert_dialog_button">Retry</string>
+
+    <string name="navigation_drawer_open" translatable="false">Open navigation drawer</string>
+    <string name="navigation_drawer_close" translatable="false">Close navigation drawer</string>
+
+</resources>
